@@ -1,0 +1,14 @@
+
+import(BiodiversityR, vegan)
+
+export(count.model, count.pred, freq.model, freq.pred, freq.ggplot,
+	VIF.subset, population.shift,
+	shift.dot.ggplot,
+	shift.pie.ggplot, pie.baker,
+	shift.moon.ggplot, moon.waxer,
+	shift.waffle.ggplot, waffle.baker,
+	shift.surf.ggplot,
+	amova.rda,
+	.onAttach)
+
+

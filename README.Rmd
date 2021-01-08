@@ -1,0 +1,398 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, echo = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  gganimate = list(
+    nframes = 50
+  )
+)
+```
+
+# AlleleShift 
+
+`AlleleShift` is an R package to predict and visualize population-level changes in allele frequencies. 
+
+The following manuscript provides details on the methods used by the package: Kindt R. 2021 (in prep.) AlleleShift: An R package to predict and visualize population-level changes in allele frequencies in response to climate change.
+
+# Installation
+
+The package can be installed from github via:
+
+```{r, eval=FALSE}
+# install.packages('devtools')
+# devtools::install_github('RoelandKindt/AlleleShift')
+```
+
+The package has also been uploaded for review to CRAN after passing all the tests available via the [win-builder](https://win-builder.r-project.org/upload.aspx) web site. Should the package become available, then th recommended method of installation would be: `install.packages('AlleleShift')`. 
+
+
+# Packages needed
+
+```{r, warning=FALSE, message=FALSE}
+library(BiodiversityR) # also loads vegan
+library(poppr) # also loads adegenet
+library(ggplot2)
+library(ggsci)
+library(ggforce)
+library(dplyr)
+library(ggrepel)
+library(patchwork)
+library(GGally)
+library(mgcv)
+library(ggmap)
+library(gggibbous)
+library(gganimate)
+
+library(AlleleShift)
+
+```
+
+
+
+
+# Predicting shifts in allele frequencies
+
+The following script is also available from the documentation of the 'count.model' function.
+
+Input data 'Poptri.baseline.env' and 'Poptri.future.env' document bioclimatic conditions for populations in baseline and future climates. 'Poptri.genind' is information on allele counts of individuals in the 'adegenet::genind' format (note that packages 'adegenet' and 'poppr' offer various methods of importing data from other applications). 
+
+```{r, warning=FALSE, message=FALSE}
+# 1. Reduce the number of explanatory variables
+
+data(Poptri.baseline.env)
+data(Poptri.future.env)
+
+VIF.select <- VIF.subset(Poptri.baseline.env, 
+                         keep=c("MAT", "CMI"), 
+                         cor.plot=TRUE)  
+
+VIF.select$VIF$vars.included
+
+baseline.env <- Poptri.baseline.env[, VIF.select$VIF$vars.included] 
+summary(baseline.env)
+
+future.env <- Poptri.future.env[, VIF.select$VIF$vars.included] 
+
+
+# 2. Create the genpop object
+
+data(Poptri.genind)
+Poptri.genpop <- adegenet::genind2genpop(Poptri.genind)
+
+# Get to know the populations and the alleles
+poppr::poppr(Poptri.genind)
+adegenet::makefreq(Poptri.genpop)
+
+# 3. Calibrate the models
+
+# Note that the ordistep procedure is not needed
+Poptri.count.model <- count.model(Poptri.genpop, 
+                                  env.data=baseline.env, 
+				  ordistep=TRUE)
+
+Poptri.pred.baseline <- count.pred(Poptri.count.model, env.data=baseline.env)
+head(Poptri.pred.baseline)
+
+Poptri.freq.model <- freq.model(Poptri.pred.baseline)
+Poptri.freq.baseline <- freq.pred(Poptri.freq.model,
+                                  count.predicted=Poptri.pred.baseline)
+
+head(Poptri.freq.baseline)
+
+# 4. Check how well the models predict baseline allele frequencies
+
+# Populations are split in those with R2 > 0.50 and those with R2 < 0.50
+# Better populations
+plotA1 <- freq.ggplot(Poptri.freq.baseline, 
+            plot.best=TRUE,
+            ylim=c(0.0, 0.8))
+plotA1
+
+# Populations with low R2
+manual.colour.values1 <- ggsci::pal_npg()(5)
+
+plotB1 <- freq.ggplot(Poptri.freq.baseline, 
+            plot.best=FALSE, 
+            manual.colour.values=manual.colour.values1,
+            xlim=c(0, 0.5),
+            ylim=c(0, 0.25))
+plotB1
+
+# Colouring by alleles
+
+plotA2 <- freq.ggplot(Poptri.freq.baseline, 
+            colour.Pop=FALSE,
+            plot.best=TRUE,
+            ylim=c(0.0, 0.8),
+            manual.colour.values=manual.colour.values1)
+
+plotA2
+
+plotB2 <- freq.ggplot(Poptri.freq.baseline, 
+            colour.Pop=FALSE,
+            plot.best=FALSE, 
+            manual.colour.values=manual.colour.values1,
+            xlim=c(0, 0.5),
+            ylim=c(0, 0.25))
+
+plotB2
+
+
+# Note that you can also compare data with:
+poppr::poppr(Poptri.genind)
+adegenet::makefreq(Poptri.genpop)
+
+
+# 5. Predict future allele frequencies
+
+Poptri.pred.future <- count.pred(Poptri.count.model, env.data=future.env)
+head(Poptri.pred.future)
+
+Poptri.freq.future <- freq.pred(Poptri.freq.model,
+                                count.predicted=Poptri.pred.future)
+
+# The key results are variables 'Allele.freq' representing the baseline allele frequencies
+# and variables 'Freq.e2', the predicted frequency for the future/ past climate.
+# Variable 'Freq.e1' is the predicted allele frequency in step 1
+
+head(Poptri.freq.future)
+
+```
+
+# Visualizations
+
+## AlleleShift::population.shift
+
+```{r, warning=FALSE, message=FALSE, fig1, fig.height=20/2.54, fig.width=17.2/2.54}
+data(Poptri.baseline.env)
+data(Poptri.future.env)
+
+VIF.select <- VIF.subset(Poptri.baseline.env, 
+                         keep=c("MAT", "CMI"), 
+                         cor.plot=FALSE)  
+
+VIF.select$vars.included
+
+baseline.env <- Poptri.baseline.env[, VIF.select$vars.included] 
+future.env <- Poptri.future.env[, VIF.select$vars.included] 
+
+plotA <- population.shift(baseline.env, 
+                 future.env,
+                 option="PCA")
+plotA
+
+```
+
+```{r, warning=FALSE, message=FALSE, fig2, fig.height=20/2.54, fig.width=17.2/2.54}
+
+plotB <- population.shift(baseline.env, 
+                 future.env,
+                 option="RDA")
+plotB
+```
+
+
+
+
+
+
+## AlleleShift::shift.dot.ggplot
+
+```{r, warning=FALSE, message=FALSE, fig3, fig.height=20/2.54, fig.width=17.2/2.54}
+# The data can be obtained via the count.model and freq.model calibrations.
+# These procedures are not repeated here.
+data(Poptri.freq.future)
+
+ggdot1 <- shift.dot.ggplot(Poptri.freq.future)
+ggdot1
+```
+
+## AlleleShift::shift.pie.ggplot
+
+```{r, warning=FALSE, message=FALSE, fig4, fig.height=20/2.54, fig.width=17.2/2.54}
+# The data can be obtained via the count.model and freq.model calibrations.
+# These procedures are not repeated here.
+data(Poptri.freq.baseline)
+data(Poptri.freq.future)
+
+Poptri.baseline.pie <- pie.baker(Poptri.freq.baseline, r0=0.1,
+                                 sort.index="Latitude.index")
+
+Poptri.future.pie <- pie.baker(Poptri.freq.future, r0=0.1, 
+                        freq.focus="Freq.e2",
+                        sort.index="Latitude.index",
+                        ypos=1)
+
+ggpie1 <- shift.pie.ggplot(Poptri.baseline.pie, 
+                           Poptri.future.pie)
+ggpie1
+```
+
+## AlleleShift::shift.moon.ggplot
+
+```{r, warning=FALSE, message=FALSE, fig5, fig.height=20/2.54, fig.width=17.2/2.54}
+# The data can be obtained via the count.model and freq.model calibrations.
+# These procedures are not repeated here.
+data(Poptri.freq.baseline)
+data(Poptri.freq.future)
+
+Poptri.baseline.moon <- moon.waxer(Poptri.freq.baseline,
+                                   sort.index="Latitude.index")
+
+Poptri.future.moon <- moon.waxer(Poptri.freq.future, 
+                                 sort.index="Latitude.index",
+                                 freq.focus="Freq.e2",
+                                ypos=1)
+
+ggmoon1 <- shift.moon.ggplot(Poptri.baseline.moon, 
+                             Poptri.future.moon)
+ggmoon1
+```
+
+## AlleleShift::shift.waffle.ggplot
+
+```{r, warning=FALSE, message=FALSE, fig6, fig.height=20/2.54, fig.width=17.2/2.54}
+# The data can be obtained via the count.model and freq.model calibrations.
+# These procedures are not repeated here.
+data(Poptri.freq.baseline)
+data(Poptri.freq.future)
+
+Poptri.future.waffle <- waffle.baker(Poptri.freq.future,
+                           sort.index="Latitude.index")
+
+ggwaffle1 <- shift.waffle.ggplot(Poptri.future.waffle)
+ggwaffle1
+```
+
+## AlleleShift::shift.surf.ggplot
+
+```{r, warning=FALSE, message=FALSE, fig7, fig.height=20/2.54, fig.width=17.2/2.54}
+# The data can be obtained via the count.model and freq.model calibrations.
+# These procedures are not repeated here.
+data(Poptri.freq.baseline)
+data(Poptri.freq.future)
+
+# Plots for the first allele
+# Symbols and colours indicate future change (green, ^ = future increase)
+# Symbol size reflects the frequency in the climate shown
+
+# Baseline climate
+plotA <- shift.surf.ggplot(Poptri.freq.future,
+                  xcoord="Long", ycoord="Lat",
+                  Allele.focus=unique(Poptri.freq.future$Allele)[1], 
+                  freq.focus="Allele.freq")
+plotA
+
+```
+
+```{r, warning=FALSE, message=FALSE, fig8, fig.height=20/2.54, fig.width=17.2/2.54}
+
+# Future/past climate
+plotB <- shift.surf.ggplot(Poptri.freq.future,
+                  xcoord="Long", ycoord="Lat",
+                  Allele.focus=unique(Poptri.freq.future$Allele)[1], 
+                  freq.focus="Freq.e2")
+plotB
+
+```
+
+
+
+```{r, warning=FALSE, message=FALSE, fig9, fig.height=20/2.54, fig.width=17.2/2.54}
+
+# Plots for the fifth allele
+
+# Baseline climate
+plotC <- shift.surf.ggplot(Poptri.freq.future,
+                  xcoord="Long", ycoord="Lat",
+                  Allele.focus=unique(Poptri.freq.future$Allele)[5], 
+                  freq.focus="Allele.freq")
+plotC
+
+```
+
+
+```{r, warning=FALSE, message=FALSE, fig10, fig.height=20/2.54, fig.width=17.2/2.54}
+
+
+plotD <- shift.surf.ggplot(Poptri.freq.future,
+                  xcoord="Long", ycoord="Lat",
+                  Allele.focus=unique(Poptri.freq.future$Allele)[5], 
+                  freq.focus="Freq.e2")
+plotD
+```
+
+
+
+## Animations
+
+With graphs that are generated via **ggplot2**, it is straightforward to create animations. The following example is also avaiable from the documentation of 'AlleleShift::shift.dot.ggplot'
+
+```{r}
+# create an animation
+
+library(ggplot2)
+library(gganimate)
+library(gifski)
+
+# The data is an interpolation and extrapolation between the baseline and future climate.
+# For actual application, interpolate between climate data from available sources
+
+data(Poptri.1985to2085)
+
+ggdot.all <- ggplot(data=Poptri.1985to2085, group=Decade) +
+  scale_y_continuous(limits=c(-0.1, 1.1),
+                     breaks=c(0.0, 0.25, 0.5, 0.75, 1.0)) +
+  geom_errorbar(aes(x=Pop, ymin=LCL, ymax=UCL),
+                colour="grey30", width=0.8, show.legend=FALSE) +
+  geom_segment(aes(x=Pop, y=Allele.freq, xend=Pop, yend=Freq.e2, colour=increasing),
+               size=1.2) +  
+  geom_point(aes(x=Pop, y=Allele.freq),
+             colour="black", size=10, alpha=0.7) +                    
+  geom_point(aes(x=Pop, y=Freq.e2),
+             colour="dodgerblue3", size=10, alpha=0.7) +  
+  coord_flip() +
+  xlab(element_blank()) +
+  ylab("Allele frequencies") +
+  theme(panel.grid.minor = element_blank()) +
+  labs(colour="Future change in allele frequencies") +
+  scale_colour_manual(values=c("firebrick3", "chartreuse4"), 
+                      labels=c("decreasing", "increasing")) +
+  theme(axis.text.x=element_text(angle=90, vjust=0.5, size=10)) +
+  theme(legend.position="top") +
+  facet_grid( ~ Allele, scales="free")
+
+ggdot.all
+
+ggdot.anim <- ggdot.all + 
+  transition_states(as.factor(Decade), transition_length = 10, state_length = 100) +
+  labs(title = "Decade: {closest_state}s")
+
+```
+
+Show the animation
+
+```{r}
+animate(ggdot.anim, fps=5, width=1280, height=720)
+```
+
+
+
+
+
+
+```{r}
+sessionInfo()
+```
+
+
+
+
+
