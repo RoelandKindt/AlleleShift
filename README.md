@@ -17,7 +17,7 @@ The package can be installed from github via:
 
 ``` r
 # install.packages('devtools')
-# devtools::install_github('RoelandKindt/AlleleShift')
+devtools::install_github('RoelandKindt/AlleleShift')
 ```
 
 The package has also been uploaded for review to CRAN after passing all
