@@ -13,18 +13,19 @@ to climate change.
 
 # Installation
 
+To install from CRAN, use:
+
+``` r
+install.packages('AlleleShift')
+```
+
+
 The package can be installed from github via:
 
 ``` r
 # install.packages('devtools')
 devtools::install_github('RoelandKindt/AlleleShift')
 ```
-
-The package has also been uploaded for review to CRAN after passing all
-the tests available via the
-[win-builder](https://win-builder.r-project.org/upload.aspx) web site.
-Should the package become available, then th recommended method of
-installation would be: `install.packages('AlleleShift')`.
 
 # Packages needed
 
