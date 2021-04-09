@@ -1,9 +1,25 @@
 
 AlleleShift versions
 
-	The suggested citation while I am finalizing a manuscript is:
-	Kindt, R. 2021 (in prep.) AlleleShift: An R package to predict and visualize 
+	The suggested citation while the manuscript is submitted and reviewed: 
+	Kindt, R. 2021 (preprint). AlleleShift: An R package to predict and visualize 
 	population-level changes in allele frequencies in response to climate change.
+	doi: https://doi.org/10.1101/2021.01.15.426775
+
+
+Version 1.0-1 (25 March 2021)
+
+	* Modified functions 'shift.dot.ggplot()' and 'shift.pie.ggplot()' to be able
+	to handle data sets where all allele frequencies change in the same direction.
+
+	* New function 'environmental.novel()' to identify populations with more 
+	extreme environmental values under climate change.
+
+
+Version 0.9-1 (29 January 2021)
+
+	* Moved 'amova.rda()' examples to 'dontrun' (example runs fine on a local
+	machine). 
 
 
 Version 0.9 (January 2021)

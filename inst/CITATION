@@ -1,0 +1,16 @@
+citHeader("To cite AlleleShift in publications use:")
+
+citEntry(entry="Article",
+	author = personList(as.person("R. Kindt")),
+	title = "AlleleShift: An R package to predict and visualize population-level changes in allele frequencies in response to climate change",
+	year = "2021",
+	doi = "10.1101/2021.01.15.426775",
+	publisher = "Cold Spring Harbor Laboratory",
+	eprint = "https://www.biorxiv.org/content/early/2021/01/17/2021.01.15.426775.full.pdf",
+	journal = "bioRxiv",
+
+	textVersion =
+	paste("Kindt, R. 2021. AlleleShift: An R package to predict and visualize 
+	population-level changes in allele frequencies in response to climate change.
+	doi: https://doi.org/10.1101/2021.01.15.426775")
+)
