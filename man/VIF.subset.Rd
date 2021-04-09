@@ -32,17 +32,15 @@ The function returns information on a subset of variables where VIF is below a p
 
 \examples{
 
-\dontrun{
+\donttest{
 
 data(Poptri.baseline.env)
 
 # error as many variables are highly correlated
-VIF.subset(Poptri.baseline.env)
+# VIF.subset(Poptri.baseline.env)
 
 VIF.subset(Poptri.baseline.env, keep=c("MAT", "CMI"), cor.plot=TRUE)
-
 }
-
 }
 
 

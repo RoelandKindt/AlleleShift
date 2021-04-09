@@ -49,8 +49,6 @@ The function generates a ggplot that depicts changes between baseline and future
 
 \examples{
 
-\dontrun{
-
 # The data can be obtained via the count.model and freq.model calibrations.
 # These procedures are not repeated here.
 data(Poptri.freq.baseline)
@@ -70,6 +68,8 @@ ggpie1
 
 
 # create an animation
+
+\dontrun{
 
 library(ggplot2)
 library(ggforce)

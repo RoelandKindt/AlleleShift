@@ -54,8 +54,6 @@ Kindt R. 2020. Ordination graphs with vegan, BiodiversityR and ggplot2. \url{htt
 
 \examples{
 
-\dontrun{
-
 # The data can be obtained via the count.model and freq.model calibrations.
 # These procedures are not repeated here.
 data(Poptri.freq.baseline)
@@ -96,6 +94,8 @@ plotD <- shift.surf.ggplot(Poptri.freq.future,
 plotD
 
 # create an animation
+
+\dontrun{
 
 library(ggplot2)
 library(ggforce)

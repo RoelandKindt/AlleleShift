@@ -1,8 +1,8 @@
 Package: AlleleShift
 Type: Package
 Title: Predict and Visualize Population-Level Changes in Allele Frequencies in Response to Climate Change
-Version: 0.9
-Date: 2021-1-4
+Version: 1.0-1
+Date: 2021-4-3
 Author: Roeland Kindt [cre, aut] (<https://orcid.org/0000-0002-7672-0712>)
 Authors@R: 
     c(person(given = "Roeland",
@@ -11,9 +11,9 @@ Authors@R:
              email = "R.KINDT@CGIAR.ORG",
              comment = c(ORCID = "0000-0002-7672-0712")))
 Maintainer: Roeland Kindt <R.KINDT@CGIAR.ORG>
-Description: Methods are provided of calibrating and predicting shifts in allele frequencies through redundancy analysis ('vegan::rda') and generalized additive models ('mgcv::gam'). Visualization functions for predicted changes in allele frequencies include 'shift.dot.ggplot', 'shift.pie.ggplot', 'shift.moon.ggplot', 'shift.waffle.ggplot' and 'shift.surf.ggplot' that are made with input data sets that are prepared by helper functions for each visualization method. Examples in the documentation show how to prepare animated climate change graphics through a time series with the 'gganimate' package. Function 'amova.rda' shows how Analysis of Molecular Variance can be directly conducted with the results from redundancy analysis.
+Description: Methods (Kindt, R. 2021. <doi:10.1101/2021.01.15.426775>) are provided of calibrating and predicting shifts in allele frequencies through redundancy analysis ('vegan::rda()') and generalized additive models ('mgcv::gam()'). Visualization functions for predicted changes in allele frequencies include 'shift.dot.ggplot()', 'shift.pie.ggplot()', 'shift.moon.ggplot()', 'shift.waffle.ggplot()' and 'shift.surf.ggplot()' that are made with input data sets that are prepared by helper functions for each visualization method. Examples in the documentation show how to prepare animated climate change graphics through a time series with the 'gganimate' package. Function 'amova.rda()' shows how Analysis of Molecular Variance can be directly conducted with the results from redundancy analysis.
 License: GPL-3
-Imports: vegan (>= 2.5-6), BiodiversityR (>= 2.12-3)
-Depends: R (>= 3.5.0)  
-Suggests: poppr, adegenet, mgcv, dplyr, ggplot2, GGally, ggforce, ggrepel, ggsci, gggibbous, gganimate, patchwork
+Imports: vegan (>= 2.5-6), BiodiversityR (>= 2.12-3), adegenet
+Depends: R (>= 3.5.0)
+Suggests: poppr, mgcv, dplyr, ggplot2, GGally, ggforce, ggrepel, ggsci, gggibbous, gganimate, patchwork
 Packaged: R. Kindt

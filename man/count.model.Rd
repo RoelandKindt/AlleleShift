@@ -68,7 +68,7 @@ The functions enable calibration and prediction of allele frequencies.
 \references{
 Blumstein et al. 2020. Protocol for Projecting Allele Frequency Change under Future Climate Change at Adaptive-Associated Loci. \doi{10.1016/j.xpro.2020.100061}
 
-Kindt R. 2021 (in prep.) AlleleShift: An R package to predict and visualize population-level changes in allele frequencies in response to climate change.
+Kindt R. 2021. AlleleShift: An R package to predict and visualize population-level changes in allele frequencies in response to climate change. \doi{10.1101/2021.01.15.426775}
 }
 
 \seealso{
@@ -80,7 +80,7 @@ Kindt R. 2021 (in prep.) AlleleShift: An R package to predict and visualize popu
 
 \examples{
 
-\dontrun{
+\donttest{
 
 # A typical work flow would consist of:
 
@@ -166,12 +166,6 @@ plotB2 <- freq.ggplot(Poptri.freq.baseline,
 
 plotB2
 
-
-# Note that you can also compare data with:
-poppr::poppr(Poptri.genind)
-adegenet::makefreq(Poptri.genpop)
-
-
 # 5. Predict future allele frequencies
 
 Poptri.pred.future <- count.pred(Poptri.count.model, env.data=future.env)
@@ -191,7 +185,6 @@ head(Poptri.freq.future)
 # shift.waffle.ggplot and shift.surf.ggplot
 
 }
-
 }
 
 

@@ -105,7 +105,6 @@ warburgia.rda
 amova.rda(warburgia.rda, warenv)
 
 }
-
 }
 
 
